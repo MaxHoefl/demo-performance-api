@@ -1,0 +1,6 @@
+container_registry: demoacr41235.azurecr.io/
+
+api:
+  image:
+    name: "demo-api"
+    tag: "latest"
