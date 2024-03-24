@@ -13,6 +13,8 @@ provider "azurerm" {
   features {}
 }
 
+variable "sql_admin_login" {}
+variable "sql_admin_password" {}
 
 # Create a resource group
 resource "azurerm_resource_group" "demo_rg" {
@@ -56,4 +58,24 @@ resource "azurerm_role_assignment" "aks_acr_role" {
   role_definition_name             = "AcrPull"
   scope                            = azurerm_container_registry.demo_acr.id
   skip_service_principal_aad_check = true
+}
+
+
+resource "azurerm_mssql_server" "azure_sql" {
+  name                         = "demosql41235"
+  resource_group_name          = azurerm_resource_group.demo_rg.name
+  location                     = azurerm_resource_group.demo_rg.location
+  version                      = "12.0"
+
+  administrator_login          = var.sql_admin_login
+  administrator_login_password = var.sql_admin_password
+}
+
+resource "azurerm_sql_database" "sql_db" {
+  name                = "demodb"
+  resource_group_name = azurerm_resource_group.demo_rg.name
+  location            = azurerm_resource_group.demo_rg.location
+  server_name         = azurerm_mssql_server.azure_sql.name
+  edition             = "Basic"
+  collation           = "SQL_LATIN1_GENERAL_CP1_CI_AS"
 }
